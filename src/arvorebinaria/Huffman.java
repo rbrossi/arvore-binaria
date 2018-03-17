@@ -1,8 +1,8 @@
 package arvorebinaria;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
@@ -11,9 +11,40 @@ public class Huffman {
 
 	public void Encode(String text) {
 		createLetterMap(text);
-		List<Entry<Character, Integer>> letterEntryOrdered = getOrderedEntryList(letterMap);
-		
-		System.out.println("sadasdas");
+		List<ArvoreBinaria<HuffmanNodeInfo>> list = createTreeList(letterMap);
+		list = SortTreeList(list);
+		Util.printTreeSet(list);
+
+		while (list.size() > 1) {
+			ArvoreBinaria<HuffmanNodeInfo> n1 = list.get(0);
+			ArvoreBinaria<HuffmanNodeInfo> n2 = list.get(1);
+
+			int frequency1 = n1.getRaiz().getInfo().getFrequency();
+			int frequency2 = n2.getRaiz().getInfo().getFrequency();
+			int newFreequency = frequency1 + frequency2;
+
+			ArvoreBinaria<HuffmanNodeInfo> newNode = new ArvoreBinaria<HuffmanNodeInfo>(
+					new NoArvoreBinaria<HuffmanNodeInfo>(new HuffmanNodeInfo(newFreequency)));
+			newNode.getRaiz().setEsquerda(n1.getRaiz());
+			newNode.getRaiz().setDireita(n2.getRaiz());
+
+			list.remove(n1);
+			list.remove(n2);
+			list.add(newNode);
+			list = SortTreeList(list);
+		}
+
+		ArvoreBinaria<HuffmanNodeInfo> tree = list.get(0);
+		Map<Character, String> huffmanEncodeMap = new HashMap<>();
+
+		letterMap.entrySet().stream().forEach(e -> {
+			String huffmanCode = tree.getHuffmanCode(e.getKey());
+			huffmanEncodeMap.put(e.getKey(), huffmanCode);
+		});
+
+		Util.printTreeSet(list);
+		//Util.printHuffmanCodeMap(huffmanEncodeMap);
+		tree.printPaths();
 
 	}
 
@@ -27,23 +58,45 @@ public class Huffman {
 			}
 		}
 
-		letterMap.values();
 		return letterMap;
 	}
-	
-	public List<Entry<Character, Integer>> getOrderedEntryList(Map<Character, Integer> map){
-		return map.entrySet().stream()
-				.sorted((k1, k2) -> Integer.compare(k1.getValue(), k2.getValue())).collect(Collectors.toList());
+
+	public List<ArvoreBinaria<HuffmanNodeInfo>> SortTreeList(List<ArvoreBinaria<HuffmanNodeInfo>> treeSet) {
+		return treeSet.stream().sorted((k1, k2) -> Integer.compare(k1.getRaiz().getInfo().getFrequency(),
+				k2.getRaiz().getInfo().getFrequency())).collect(Collectors.toList());
 	}
 
-	public void printMap() {
-		for (Map.Entry<Character, Integer> a : letterMap.entrySet()) {
-			System.out.println(a.getKey() + ": " + a.getValue());
-		}
+	public List<ArvoreBinaria<HuffmanNodeInfo>> createTreeList(Map<Character, Integer> map) {
+		return map.entrySet().stream()
+				.map(e -> new ArvoreBinaria<HuffmanNodeInfo>(
+						new NoArvoreBinaria<HuffmanNodeInfo>(new HuffmanNodeInfo(e.getValue(), e.getKey()))))
+				.collect(Collectors.toList());
 	}
 
 	public static void main(String[] args) {
 		new Huffman().Encode("ABBBCDEFGA");
 	}
 
+	static class Util {
+		public void printMap(Map<Character, Integer> letterMap) {
+			for (Map.Entry<Character, Integer> a : letterMap.entrySet()) {
+				System.out.println(a.getKey() + ": " + a.getValue());
+			}
+		}
+
+		private static void printTreeSet(List<ArvoreBinaria<HuffmanNodeInfo>> set) {
+			System.out.println("--------------");
+			set.stream().forEach(e -> {
+				e.toString();
+				// System.out.println(e.getRaiz().getInfo().getCharacter() +
+				// ":"+e.getRaiz().getInfo().getFrequency());
+			});
+		}
+
+		private static void printHuffmanCodeMap(Map<Character, String> map) {
+			map.entrySet().stream().forEach(e -> {
+				System.out.println(e.getKey()+":"+e.getValue());
+			});
+		}
+	}
 }
