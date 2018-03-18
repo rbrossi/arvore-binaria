@@ -1,8 +1,12 @@
 package arvorebinaria;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public abstract class ArvoreBinariaAbstract<T> {
 
 	private StringBuilder huffmanCode;
+	private Map<Character, String> huffmanEncodeMap;
 
 	private NoArvoreBinaria<T> raiz;
 
@@ -47,42 +51,15 @@ public abstract class ArvoreBinariaAbstract<T> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public String getHuffmanCode(Character character) {
-		huffmanCode = new StringBuilder();
-		return GetHuffmanCode(((NoArvoreBinaria<HuffmanNodeInfo>) raiz), character, 0);
-	}
-
-	private String GetHuffmanCode(NoArvoreBinaria<HuffmanNodeInfo> no, Character character, int direcao) {
-		if (direcao == -1) {
-			huffmanCode.append("0");
-		} else if (direcao == 1) {
-			huffmanCode.append("1");
-		}
-
-		if (no == null)
-			return "";
-		else {
-			if (no.getInfo().getCharacter() == character) {
-				return huffmanCode.toString();
-			} else {
-				String result = GetHuffmanCode(no.getEsquerda(), character, -1);
-				if (result.equals("")) {
-					return GetHuffmanCode(no.getDireita(), character, 1);
-				}
-				return result;
-			}
-		}
-
-	}
-
-	public void printPaths() {
+	public Map<Character, String> getCharCodeMap() {
+		huffmanEncodeMap = new HashMap<>();
 		int path[] = new int[1000];
-		printPathsRecur((NoArvoreBinaria<HuffmanNodeInfo>) raiz, path, 0, 0);
+		return generateCharCodeMap((NoArvoreBinaria<HuffmanNodeInfo>) raiz, path, 0, 0);
 	}
 	
-	void printPathsRecur(NoArvoreBinaria<HuffmanNodeInfo> node, int path[], int pathLen, int direction) {
+	private Map<Character, String> generateCharCodeMap(NoArvoreBinaria<HuffmanNodeInfo> node, int path[], int pathLen, int direction) {
 		if (node == null)
-			return;
+			return huffmanEncodeMap;
 
 		/* append this node to the path array */
 		if (direction == -1) {
@@ -95,13 +72,21 @@ public abstract class ArvoreBinariaAbstract<T> {
 		
 
 		/* it's a leaf, so print the path that led to here */
-		if (node.getEsquerda() == null && node.getDireita() == null)
+		if (node.getEsquerda() == null && node.getDireita() == null) {
+			String code = "";
+	        for (int i = 0; i < pathLen; i++) 
+	        {
+	            code += path[i];
+	        }
+			
+			huffmanEncodeMap.put(node.getInfo().getCharacter(), code);
 			printArray(path, pathLen);
-		else {
+		} else {
 			/* otherwise try both subtrees */
-			printPathsRecur(node.getEsquerda(), path, pathLen, -1);
-			printPathsRecur(node.getDireita(), path, pathLen, 1);
+			generateCharCodeMap(node.getEsquerda(), path, pathLen, -1);
+			generateCharCodeMap(node.getDireita(), path, pathLen, 1);
 		}
+		return huffmanEncodeMap;
 	}
 	
 	  void printArray(int ints[], int len) 

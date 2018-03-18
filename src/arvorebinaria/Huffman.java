@@ -9,11 +9,10 @@ import java.util.stream.Collectors;
 public class Huffman {
 	private Map<Character, Integer> letterMap = new TreeMap<>();
 
-	public void Encode(String text) {
+	public String Encode(String text) {
 		createLetterMap(text);
 		List<ArvoreBinaria<HuffmanNodeInfo>> list = createTreeList(letterMap);
 		list = SortTreeList(list);
-		Util.printTreeSet(list);
 
 		while (list.size() > 1) {
 			ArvoreBinaria<HuffmanNodeInfo> n1 = list.get(0);
@@ -37,15 +36,15 @@ public class Huffman {
 		ArvoreBinaria<HuffmanNodeInfo> tree = list.get(0);
 		Map<Character, String> huffmanEncodeMap = new HashMap<>();
 
-		letterMap.entrySet().stream().forEach(e -> {
-			String huffmanCode = tree.getHuffmanCode(e.getKey());
-			huffmanEncodeMap.put(e.getKey(), huffmanCode);
-		});
+		huffmanEncodeMap = tree.getCharCodeMap();
 
-		Util.printTreeSet(list);
-		//Util.printHuffmanCodeMap(huffmanEncodeMap);
-		tree.printPaths();
-
+		StringBuilder result = new StringBuilder();
+		for (char c : text.toCharArray()) {
+			result.append(huffmanEncodeMap.get(c));
+		}
+		
+		System.out.println(result.toString());
+		return result.toString();
 	}
 
 	public Map<Character, Integer> createLetterMap(String frase) {
@@ -71,10 +70,6 @@ public class Huffman {
 				.map(e -> new ArvoreBinaria<HuffmanNodeInfo>(
 						new NoArvoreBinaria<HuffmanNodeInfo>(new HuffmanNodeInfo(e.getValue(), e.getKey()))))
 				.collect(Collectors.toList());
-	}
-
-	public static void main(String[] args) {
-		new Huffman().Encode("ABBBCDEFGA");
 	}
 
 	static class Util {
