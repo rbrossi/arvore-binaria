@@ -4,10 +4,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.math.BigDecimal;
 
 public class Main {
 	public static void main(String[] args) throws IOException {
-		
+		long startTime = System.nanoTime();
 		//Deve-se criar o arquivo C:\temp\msg.txt com o texto a ser comprimido 
 		Huffman h = new Huffman();
 		
@@ -46,5 +47,9 @@ public class Main {
 		try (PrintWriter out = new PrintWriter(decodedFile)) {
 		    out.println(decoded);
 		}
+		long endTime = System.nanoTime();
+
+		long durationMilis = (endTime - startTime)/1000000;
+		System.out.println(durationMilis);
 	}
 }
