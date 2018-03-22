@@ -8,8 +8,9 @@ import java.util.stream.Collectors;
 
 public class Huffman {
 	private Map<Character, Integer> letterMap = new TreeMap<>();
+	private ArvoreBinaria<HuffmanNodeInfo> tree;
 
-	public String Encode(String text) {
+	public String encode(String text) {
 		createLetterMap(text);
 		List<ArvoreBinaria<HuffmanNodeInfo>> list = createTreeList(letterMap);
 		list = SortTreeList(list);
@@ -33,7 +34,7 @@ public class Huffman {
 			list = SortTreeList(list);
 		}
 
-		ArvoreBinaria<HuffmanNodeInfo> tree = list.get(0);
+		tree = list.get(0);
 		Map<Character, String> huffmanEncodeMap = new HashMap<>();
 
 		huffmanEncodeMap = tree.getCharCodeMap();
@@ -42,11 +43,34 @@ public class Huffman {
 		for (char c : text.toCharArray()) {
 			result.append(huffmanEncodeMap.get(c));
 		}
-		
+		System.out.println(tree.toString());
+		System.out.println(huffmanEncodeMap.toString());
 		System.out.println(result.toString());
 		return result.toString();
 	}
-
+	
+	public String decode(String codedText) {
+		char[] charArray = codedText.toCharArray();
+		StringBuilder result = new StringBuilder();
+		
+		NoArvoreBinaria<HuffmanNodeInfo> no = tree.getRaiz();
+		for (int i = 0; i < charArray.length; i++) {
+			char c = charArray[i];
+			if (no.getEsquerda() == null && no.getDireita() == null) {//eh folha
+				Character x = no.getInfo().getCharacter();
+				result.append(x);
+				no = tree.getRaiz();
+				i--;
+			} else if (c == '0'){
+				no = no.getEsquerda();
+			} else if (c == '1') {
+				no = no.getDireita();
+			}
+		}
+		
+		return result.toString();
+	}
+	
 	public Map<Character, Integer> createLetterMap(String frase) {
 		for (char item : frase.toCharArray()) {
 			Integer s = letterMap.get(item);
