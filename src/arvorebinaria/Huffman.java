@@ -52,22 +52,31 @@ public class Huffman {
 	public String decode(String codedText) {
 		char[] charArray = codedText.toCharArray();
 		StringBuilder result = new StringBuilder();
+		boolean firstRepetition = true; 
 		
 		NoArvoreBinaria<HuffmanNodeInfo> no = tree.getRaiz();
 		for (int i = 0; i < charArray.length; i++) {
-			char c = charArray[i];
 			if (no.getEsquerda() == null && no.getDireita() == null) {//eh folha
 				Character x = no.getInfo().getCharacter();
 				result.append(x);
 				no = tree.getRaiz();
 				i--;
-			} else if (c == '0'){
-				no = no.getEsquerda();
-			} else if (c == '1') {
-				no = no.getDireita();
+			} else {
+				char c = charArray[i];
+				
+				if (i == charArray.length-1 && firstRepetition) {
+					firstRepetition = false;
+					i--;
+				}
+				
+				if (c == '0'){
+					no = no.getEsquerda();
+				} else if (c == '1') {
+					no = no.getDireita();
+				}
 			}
-		}
-		
+			
+		}		
 		return result.toString();
 	}
 	

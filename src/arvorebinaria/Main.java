@@ -7,6 +7,8 @@ import java.io.PrintWriter;
 
 public class Main {
 	public static void main(String[] args) throws IOException {
+		
+		//Deve-se criar o arquivo C:\temp\msg.txt com o texto a ser comprimido 
 		Huffman h = new Huffman();
 		
 		File file = new File("C:\\temp\\msg.txt");
@@ -33,6 +35,16 @@ public class Main {
 		    out.println(encoded);
 		}
 		
-		System.out.println(h.decode(encoded));
+		String decoded = h.decode(encoded);
+		System.out.println(decoded);
+		
+		File decodedFile = new File("C:\\temp\\msgDecoded.txt");
+		if (!decodedFile.exists()) {
+			decodedFile.createNewFile();
+		}
+		
+		try (PrintWriter out = new PrintWriter(decodedFile)) {
+		    out.println(decoded);
+		}
 	}
 }
